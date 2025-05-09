@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZimBizCard - Digital Business ID</title>
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/6/6a/Flag_of_Zimbabwe.svg" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background: #006400;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flag {
+      width: 40px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    .container {
+      padding: 1rem 2rem;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 1rem;
+    }
+    input, button {
+      padding: 0.6rem;
+      margin: 0.4rem 0;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #006400;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #228B22;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img class="flag" src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Flag_of_Zimbabwe.svg" alt="Flag" />
+    ZimBizCard - Digital Business Identity
+  </header>
+
+  <div class="container">
+    <h2>👤 Create Your Business ID</h2>
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="text" id="business" placeholder="Business Name" />
+    <input type="text" id="phone" placeholder="Phone Number" />
+    <input type="text" id="website" placeholder="Website URL (optional)" />
+    <button onclick="generateQRCode()">Generate QR Code</button>
+    <div id="qrcode" style="text-align:center; margin:1rem 0;"></div>
+    <button onclick="saveToFirebase()">Save to Firebase</button>
+    <hr />
+    <h3>Sign Up / Login</h3>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="logIn()">Log In</button>
+    <button onclick="logOut()">Log Out</button>
+    <button onclick="resetPassword()">Forgot Password?</button>
+  </div>
+
+  <div class="footer">
+    Built by <strong>Elshaddai Anesu Mugugu</strong>, 18 years old. Empowering Zimbabwe through digital innovation.
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdysaqo1qOAVK_LWUhTB-PZuLuGdGtLoU",
+      authDomain: "zimbizcard.firebaseapp.com",
+      projectId: "zimbizcard",
+      storageBucket: "zimbizcard.firebasestorage.app",
+      messagingSenderId: "580093593432",
+      appId: "1:580093593432:web:6ed7816e18c5ce81a9c72d",
+      measurementId: "G-H0DLLEE88W"
+    };
+
+    // Init Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Auth Functions
+    function signUp() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(() => alert("Signed up successfully"))
+        .catch(err => alert(err.message));
+    }
+
+    function logIn() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => alert("Logged in"))
+        .catch(err => alert(err.message));
+    }
+
+    function logOut() {
+      auth.signOut()
+        .then(() => alert("Logged out"));
+    }
+
+    function resetPassword() {
+      const email = document.getElementById("email").value;
+      auth.sendPasswordResetEmail(email)
+        .then(() => alert("Reset email sent"))
+        .catch(err => alert(err.message));
+    }
+
+    // QR + Firestore
+    function generateQRCode() {
+      const name = document.getElementById("name").value;
+      const business = document.getElementById("business").value;
+      const phone = document.getElementById("phone").value;
+      const website = document.getElementById("website").value;
+      const qrText = `Name: ${name}\nBusiness: ${business}\nPhone: ${phone}\nWebsite: ${website}`;
+      QRCode.toCanvas(document.createElement('canvas'), qrText, function (error, canvas) {
+        if (error) console.error(error);
+        document.getElementById("qrcode").innerHTML = '';
+        document.getElementById("qrcode").appendChild(canvas);
+      });
+    }
+
+    function saveToFirebase() {
+      const name = document.getElementById("name").value;
+      const business = document.getElementById("business").value;
+      const phone = document.getElementById("phone").value;
+      const website = document.getElementById("website").value;
+
+      db.collection("bizcards").add({
+        name,
+        business,
+        phone,
+        website,
+        timestamp: new Date()
+      })
+      .then(() => alert("Saved to Firebase!"))
+      .catch(error => alert("Error: " + error.message));
+    }
+  </script>
+</body>
+</html>

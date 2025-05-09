@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">zimBizCard</string>
+    <string name="title_activity_main">zimBizCard</string>
+    <string name="package_name">com.zimbizcard.app</string>
+    <string name="custom_url_scheme">com.zimbizcard.app</string>
+</resources>

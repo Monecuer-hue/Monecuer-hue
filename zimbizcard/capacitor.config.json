@@ -1,0 +1,6 @@
+{
+  "appId": "com.zimbizcard.app",
+  "appName": "zimBizCard",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
